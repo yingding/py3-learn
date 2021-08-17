@@ -38,6 +38,28 @@ def decorator_factory(argument):
 
 # it returns the function which returns the function object
 
+It is also possible to chain the decorators
+
+def decor1(func): 
+    def inner(): 
+        x = func() 
+        return x * x 
+    return inner 
+  
+def decor(func): 
+    def inner(): 
+        x = func() 
+        return 2 * x 
+    return inner 
+  
+@decor1
+@decor
+def num(): 
+    return 8
+  
+print(num())
+> (8 * 2)**2 = 16 * 16 = 256
+
 
 '''
 
@@ -55,9 +77,15 @@ def calculate_time(func):
         result = func(*args, **kwargs)
         # storing time after function execution
         end = time.time()
+        # func:function is an object and has an attribute __name__
         print(f"Total execution time of {func.__name__} function is {end - begin}s")
         return result
-    return inner    
+    return inner
+
+def negate_value(func):
+    def inner(*args, **kwargs):
+        return -1 * func(*args, **kwargs)
+    return inner           
 
 
 @calculate_time
@@ -70,11 +98,36 @@ def factorial(num: int) -> int:
     return math.factorial(num)
 
 
+''' 
+chain of function decorator
+which is the same to
+foo = negate_value(foo)
+foo = calculate_time(foo)
+
+or
+foo = calculate_time(negate_value(foo))
+'''
+@calculate_time
+@negate_value
+def negated_factorial(num: int) -> int:
+    """
+    this function calculates the negated value of the given number's factorial
+    """
+    # give some wait time
+    time.sleep(2)
+    return math.factorial(num)
+
+
 def main():
-    # function is an object and has an attribute __name__
-    # print(f"{main.__name__} is called.")
-    num = 2
-    print(f"factorial of {num} is {factorial(num)}")
+    num = 3
+    # runs alone 2.0005698204040527s
+    # Hint: comment the following line to deactivate the interpreter cache 
+    #       and see how the runtime of negated_factorial function increase.
+    print(f"factorial of {num} is {factorial(num)}\n")
+    # it is to notice, the interpreter caches the value of math.factorial(int), 
+    # as single call, the negated_factorial runs in 2.0018250942230225s
+    # that is 1ms longer than the call of decorated factorial function.
+    print(f"negated factorial of {num} is {negated_factorial(num)}")
 
 
 ## == equal value, while "is" operator test the equal object 

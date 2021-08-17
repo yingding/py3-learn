@@ -1,2 +1,4 @@
 # no vs code 
 .vscode
+# local file for testing code blocks
+playground.py
